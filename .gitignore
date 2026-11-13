@@ -13,7 +13,9 @@
 
 # Code coverage profiles and other test artifacts
 *.out
-coverage.*
+coverage.html
+coverage.txt
+coverage.xml
 *.coverprofile
 profile.cov
 
@@ -30,3 +32,4 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+out

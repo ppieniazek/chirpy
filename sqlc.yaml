@@ -1,0 +1,19 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "sql/queries"
+    schema: "sql/schema"
+    gen:
+      go:
+        out: "internal/database"
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "uuid"
+              type: "UUID"
+          - db_type: "uuid"
+            nullable: true
+            go_type:
+              import: "uuid"
+              type: "UUID"
+              pointer: true

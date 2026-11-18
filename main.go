@@ -15,6 +15,7 @@ import (
 type apiConfig struct {
 	fileServerHits atomic.Int32
 	db             *database.Queries
+	platform       string
 }
 
 func main() {
@@ -28,12 +29,16 @@ func main() {
 	if dbURL == "" {
 		log.Fatal("DB_URL must be set")
 	}
+	platform := os.Getenv("PLATFORM")
+	if platform == "" {
+		log.Fatal("PLATFORM must be set")
+	}
 
 	dbConn, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatalf("Couldn't connect to database: %v", err)
 	}
-	apiCfg := apiConfig{db: database.New(dbConn)}
+	apiCfg := apiConfig{db: database.New(dbConn), platform: platform}
 
 	rootFileServerHandler := http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))
 	mux := http.NewServeMux()
@@ -47,7 +52,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(http.StatusText(http.StatusOK)))
 	})
-	mux.HandleFunc("POST /api/validate_chirp", validateChirpHandler)
+	mux.HandleFunc("POST /api/chirps", apiCfg.createChirpHandler)
+	mux.HandleFunc("POST /api/users", apiCfg.createUserHandler)
 
 	s := &http.Server{
 		Handler: mux,
